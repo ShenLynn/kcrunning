@@ -9,9 +9,18 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@tmcw/togeojson": "^7.1.2",
+    "@turf/bbox": "^7.3.4",
+    "@turf/centroid": "^7.3.4",
+    "@turf/length": "^7.3.4",
+    "@turf/simplify": "^7.3.4",
+    "@types/geojson": "^7946.0.16",
+    "@xmldom/xmldom": "^0.8.11",
+    "maplibre-gl": "^5.19.0",
     "next": "16.1.6",
     "react": "19.2.3",
-    "react-dom": "19.2.3"
+    "react-dom": "19.2.3",
+    "react-map-gl": "^8.1.0"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
