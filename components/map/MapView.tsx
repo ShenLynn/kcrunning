@@ -19,6 +19,7 @@ export default function MapView() {
   const mapRef = useRef<MapRef>(null)
   const [pins, setPins] = useState<RoutePin[]>([])
   const [selectedRoute, setSelectedRoute] = useState<Route | null>(null)
+  const [popupOpen, setPopupOpen] = useState(false)
   const [loadingRoute, setLoadingRoute] = useState(false)
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
@@ -56,17 +57,30 @@ export default function MapView() {
   }, [fetchPins])
 
   const handlePinClick = useCallback(async (id: string) => {
+    // Clicking the already-selected pin toggles the popup
+    if (selectedRoute?.id === id) {
+      setPopupOpen((open) => !open)
+      return
+    }
     setLoadingRoute(true)
     try {
       const res = await fetch(`/api/routes/${id}`)
       const route: Route = await res.json()
       setSelectedRoute(route)
+      setPopupOpen(true)
     } finally {
       setLoadingRoute(false)
     }
-  }, [])
+  }, [selectedRoute])
 
-  const handleDeselect = useCallback(() => setSelectedRoute(null), [])
+  // Close popup but keep polyline on map
+  const handleClosePopup = useCallback(() => setPopupOpen(false), [])
+
+  // Clear everything — polyline and popup
+  const handleDeselect = useCallback(() => {
+    setSelectedRoute(null)
+    setPopupOpen(false)
+  }, [])
 
   return (
     <div className="relative w-screen h-screen">
@@ -85,13 +99,14 @@ export default function MapView() {
       >
         <PinLayer pins={pins} onPinClick={handlePinClick} selectedId={selectedRoute?.id ?? null} />
         {selectedRoute && <RouteLayer route={selectedRoute} />}
-        {selectedRoute && (
+        {selectedRoute && popupOpen && (
           <RoutePopup
             route={selectedRoute}
-            onClose={handleDeselect}
+            onClose={handleClosePopup}
             onRouteRemoved={(id) => {
               setPins((prev) => prev.filter((p) => p.id !== id))
               setSelectedRoute(null)
+              setPopupOpen(false)
             }}
           />
         )}
