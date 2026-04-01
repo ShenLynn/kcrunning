@@ -4,5 +4,5 @@ import { validateSession } from '@/lib/session'
 export async function isAdminAuthenticated(): Promise<boolean> {
   const cookieStore = await cookies()
   const token = cookieStore.get('admin_session')?.value
-  return validateSession(token)
+  return await validateSession(token)
 }

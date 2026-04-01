@@ -8,7 +8,7 @@ export async function POST(request: NextRequest) {
   if (password !== process.env.ADMIN_PASSWORD) {
     return NextResponse.json({ error: 'Wrong password' }, { status: 401 })
   }
-  const token = createSession()
+  const token = await createSession()
   const response = NextResponse.json({ success: true })
   response.cookies.set('admin_session', token, {
     httpOnly: true,
