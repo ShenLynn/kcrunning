@@ -4,7 +4,7 @@ import RoutePageClient from '@/components/map/RoutePageClient'
 
 export default async function RoutePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
-  const route = getRouteById(id)
+  const route = await getRouteById(id)
   if (!route || route.status !== 'approved') notFound()
 
   return (

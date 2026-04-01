@@ -12,8 +12,8 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Invalid bbox params' }, { status: 400 })
   }
 
-  const pins = getRoutesInBbox(west, south, east, north)
+  const pins = await getRoutesInBbox(west, south, east, north)
   return NextResponse.json(pins, {
-    headers: { 'Cache-Control': 'no-store' }, // s-maxage=30 added in Stage B
+    headers: { 'Cache-Control': 's-maxage=30, stale-while-revalidate=60' },
   })
 }

@@ -2,12 +2,7 @@
 
 import { useState, useRef } from 'react'
 import { MapRef } from 'react-map-gl/maplibre'
-
-interface NominatimResult {
-  display_name: string
-  lat: string
-  lon: string
-}
+import type { GeocodingResult } from '@/app/api/geocode/route'
 
 interface Props {
   mapRef: React.RefObject<MapRef | null>
@@ -15,7 +10,7 @@ interface Props {
 
 export default function SearchControl({ mapRef }: Props) {
   const [query, setQuery] = useState('')
-  const [results, setResults] = useState<NominatimResult[]>([])
+  const [results, setResults] = useState<GeocodingResult[]>([])
   const [loading, setLoading] = useState(false)
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
@@ -26,11 +21,8 @@ export default function SearchControl({ mapRef }: Props) {
     debounceRef.current = setTimeout(async () => {
       setLoading(true)
       try {
-        const res = await fetch(
-          `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(value)}&format=json&limit=5`,
-          { headers: { 'Accept-Language': 'en' } }
-        )
-        const data: NominatimResult[] = await res.json()
+        const res = await fetch(`/api/geocode?q=${encodeURIComponent(value)}`)
+        const data: GeocodingResult[] = await res.json()
         setResults(data)
       } catch {
         setResults([])
@@ -40,13 +32,13 @@ export default function SearchControl({ mapRef }: Props) {
     }, 400)
   }
 
-  function selectResult(result: NominatimResult) {
+  function selectResult(result: GeocodingResult) {
     mapRef.current?.flyTo({
-      center: [parseFloat(result.lon), parseFloat(result.lat)],
+      center: [result.lng, result.lat],
       zoom: 14,
       duration: 1200,
     })
-    setQuery(result.display_name.split(',')[0])
+    setQuery(result.place_name.split(',')[0])
     setResults([])
   }
 
@@ -72,7 +64,7 @@ export default function SearchControl({ mapRef }: Props) {
                 onClick={() => selectResult(r)}
                 className="w-full text-left px-4 py-2 hover:bg-gray-50 text-gray-800 truncate"
               >
-                {r.display_name}
+                {r.place_name}
               </button>
             </li>
           ))}

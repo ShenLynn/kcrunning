@@ -7,7 +7,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
   const { id } = await request.json()
-  const ok = approveRoute(id)
+  const ok = await approveRoute(id)
   if (!ok) return NextResponse.json({ error: 'Route not found' }, { status: 404 })
   return NextResponse.json({ success: true })
 }

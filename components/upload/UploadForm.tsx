@@ -2,7 +2,10 @@
 
 import { useState, useRef } from 'react'
 import dynamic from 'next/dynamic'
+import Script from 'next/script'
 import { parseGpx, stripTimestamps } from '@/lib/gpx'
+
+const TURNSTILE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY
 
 const GPXPreview = dynamic(() => import('./GPXPreview'), { ssr: false })
 
@@ -80,6 +83,10 @@ export default function UploadForm() {
   }
 
   return (
+    <>
+      {TURNSTILE_KEY && (
+        <Script src="https://challenges.cloudflare.com/turnstile/v0/api.js" strategy="afterInteractive" />
+      )}
     <form onSubmit={handleSubmit} className="space-y-5">
       {/* Honeypot */}
       <input type="text" name="website" className="hidden" tabIndex={-1} autoComplete="off" />
@@ -149,6 +156,11 @@ export default function UploadForm() {
         />
       </div>
 
+      {/* Cloudflare Turnstile */}
+      {TURNSTILE_KEY && (
+        <div className="cf-turnstile" data-sitekey={TURNSTILE_KEY} data-theme="light" />
+      )}
+
       {submitError && (
         <p className="text-sm text-red-600 bg-red-50 px-3 py-2 rounded-lg">{submitError}</p>
       )}
@@ -165,5 +177,6 @@ export default function UploadForm() {
         Routes are reviewed before appearing on the map.
       </p>
     </form>
+    </>
   )
 }

@@ -4,7 +4,9 @@ import Map, { Source, Layer } from 'react-map-gl/maplibre'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import * as turfBbox from '@turf/bbox'
 
-const MAP_STYLE = 'https://tiles.openfreemap.org/styles/liberty'
+const MAP_STYLE = process.env.NEXT_PUBLIC_MAPTILER_KEY
+  ? `https://api.maptiler.com/maps/streets-v2/style.json?key=${process.env.NEXT_PUBLIC_MAPTILER_KEY}`
+  : 'https://tiles.openfreemap.org/styles/liberty'
 
 interface Props {
   geojson: GeoJSON.Feature<GeoJSON.LineString>

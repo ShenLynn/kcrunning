@@ -9,6 +9,7 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.101.1",
     "@tmcw/togeojson": "^7.1.2",
     "@turf/bbox": "^7.3.4",
     "@turf/centroid": "^7.3.4",
