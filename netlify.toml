@@ -1,0 +1,11 @@
+[build]
+  command = "npm run build"
+  publish = ".next"
+
+[build.environment]
+  # NEXT_PUBLIC_* keys are intentionally embedded in client-side bundles.
+  # Omit them from secrets scanning to prevent false positives.
+  SECRETS_SCAN_OMIT_KEYS = "NEXT_PUBLIC_MAPTILER_KEY,NEXT_PUBLIC_TURNSTILE_SITE_KEY"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
