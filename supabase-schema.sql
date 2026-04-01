@@ -44,7 +44,25 @@ ALTER TABLE reports ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "public_read_approved" ON routes
   FOR SELECT USING (status = 'approved');
 
--- Step 6: Viewport query function
+-- Step 6: Trigger to auto-populate PostGIS geometry columns from geojson
+CREATE OR REPLACE FUNCTION populate_route_geometry()
+RETURNS TRIGGER AS $$
+BEGIN
+  NEW.geometry := ST_SetSRID(
+    ST_GeomFromGeoJSON((NEW.geojson -> 'geometry')::text),
+    4326
+  );
+  NEW.centroid := ST_Centroid(NEW.geometry);
+  NEW.bbox     := NEW.geometry::box2d;
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER set_route_geometry
+  BEFORE INSERT OR UPDATE OF geojson ON routes
+  FOR EACH ROW EXECUTE FUNCTION populate_route_geometry();
+
+-- Step 7: Viewport query function
 CREATE OR REPLACE FUNCTION routes_in_bbox(
   west float, south float, east float, north float
 )
